@@ -1,2 +1,2 @@
-# BD_netdisk
-Baidu Netdisk auto check in.
+# Daily_Checkin
+An automatic check in script.
