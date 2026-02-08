@@ -3,9 +3,9 @@ import re
 import requests
 
 # 设置参数
-BAIDU_COOKIE = '你的百度网盘Cookie' # 替换为你的实际Cookie
-TELEGRAM_BOT_TOKEN = '你的Telegram机器人Token' # 替换为你的实际Token，如不需要可留空
-TELEGRAM_CHAT_ID = '你的Telegram聊天ID' # 替换为你的实际聊天ID，如不需要可留空
+BAIDU_COOKIE = os.getenv("BAIDU_COOKIE")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 HEADERS = {
     'Connection': 'keep-alive',
