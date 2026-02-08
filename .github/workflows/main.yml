@@ -1,0 +1,30 @@
+name: Check in
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'   # 每天北京时间9点（UTC+8）
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install requests
+
+    - name: Run script
+      env:
+        BAIDU_COOKIE: ${{ secrets.BAIDU_COOKIE }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: |
+        python VE.py
