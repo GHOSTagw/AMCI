@@ -1,4 +1,4 @@
-name: Action2_BD
+name: action_BD
 
 on:
   workflow_dispatch:
@@ -28,4 +28,4 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          python action_copilot.py
+          python action_BD.py
