@@ -1,2 +1,2 @@
-# BD_netdisk_p
-BD_netdisk_private
+# BD_netdisk
+Baidu Netdisk auto check in.
