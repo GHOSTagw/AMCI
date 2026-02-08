@@ -1,2 +1,1 @@
-# Daily_Checkin
-An automatic check in script.
+# An automatic check in script
