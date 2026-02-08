@@ -3,7 +3,7 @@ name: Check in
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 1 * * *'   # 每天北京时间9点（UTC+8）
+    - cron: '0 20 * * *'
 
 jobs:
   run:
