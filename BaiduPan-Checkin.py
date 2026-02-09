@@ -3,11 +3,7 @@ import time
 import re
 import os
 
-# 从环境变量中获取 Cookie
-# COOKIES = os.environ.get('BAIDU_COOKIE_S')
-
-# F12从 Cookie 获取下面两个值
-COOKIES = "BDUSS=xxxx; BAIDUID=xxxx;"
+COOKIES = os.environ.get('BAIDU_COOKIE_S')
 
 HEADERS = {
     'Connection': 'keep-alive',
