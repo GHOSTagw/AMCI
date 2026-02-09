@@ -27,5 +27,6 @@ jobs:
           BAIDU_COOKIE: ${{ secrets.BAIDU_COOKIE }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          BAIDU_COOKIE_S: ${{ secrets.BAIDU_COOKIE_S }}
         run: |
           python action_BD.py
