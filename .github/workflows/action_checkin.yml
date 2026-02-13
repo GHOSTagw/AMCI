@@ -1,4 +1,4 @@
-name: action_amci
+name: AMCI
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     - cron: '0 20 * * *'
 
 jobs:
-  run:
+  auto_checkin:
     runs-on: ubuntu-latest
 
     steps:
