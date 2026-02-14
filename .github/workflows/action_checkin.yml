@@ -6,8 +6,8 @@ on:
     - cron: '0 20 * * *'
 
 jobs:
-  auto_checkin:
-    runs-on: ubuntu-latest
+  auto_checkin_BD:
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v4
