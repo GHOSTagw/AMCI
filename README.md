@@ -6,3 +6,5 @@ This repository collects auto check-in projects from others for learning and per
  Name | Repo | Current Script 
 :-----|:-----|:---------------
  百度网盘 | [tunecc/DuPan](https://github.com/tunecc/DuPan) | [action_BD_GPT.py](./action_BD_GPT.py) 
+ 科研通 | [daitcl/ablesciSign](https://github.com/daitcl/ablesciSign) | [action_ablesci_GPT.py](./action_ablesci_GPT.py) 
+
