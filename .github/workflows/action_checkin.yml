@@ -6,7 +6,7 @@ on:
     - cron: '0 20 * * *'
 
 jobs:
-  auto_checkin_BD:
+  auto_checkin:
     runs-on: ubuntu-latest
 
     steps:
