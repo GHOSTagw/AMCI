@@ -6,33 +6,31 @@ import sys
 import subprocess
 import datetime
 import requests
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # ================== Telegram 配置 ==================
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# 是否仅在失败时发送
 ONLY_FAIL_NOTIFY = os.getenv("ONLY_FAIL_NOTIFY", "false").lower() == "true"
 
-# 需要执行的脚本列表（手动维护）
+# 手动维护脚本
 SCRIPTS = [
     "ablesci_GPT_n.py",
-    "baidupan_GPT_n.py",
+    "action_baidu_sign.py",
 ]
 
+# ================== Telegram ==================
 
-# ================== Telegram 发送 ==================
-
-def send_telegram(message: str):
+def send_telegram(message):
 
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram 未配置")
         return
 
-    # Telegram 单条限制 4096
     if len(message) > 4000:
-        message = message[:4000] + "\n\n...(日志过长已截断)"
+        message = message[:4000] + "\n...(日志过长已截断)"
 
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
@@ -51,7 +49,7 @@ def send_telegram(message: str):
             print("Telegram发送失败:", resp.text)
 
     except Exception as e:
-        print("Telegram 发送异常:", e)
+        print("Telegram异常:", e)
 
 
 # ================== 执行脚本 ==================
@@ -75,15 +73,11 @@ def run_script(script_name):
             timeout=300
         )
 
-        output = result.stdout.strip()
-        error = result.stderr.strip()
-        exit_code = result.returncode
-
         return {
             "name": script_name,
-            "exit_code": exit_code,
-            "stdout": output,
-            "stderr": error
+            "exit_code": result.returncode,
+            "stdout": result.stdout.strip(),
+            "stderr": result.stderr.strip()
         }
 
     except subprocess.TimeoutExpired:
@@ -101,60 +95,54 @@ def run_script(script_name):
             "name": script_name,
             "exit_code": 98,
             "stdout": "",
-            "stderr": f"执行异常: {str(e)}"
+            "stderr": str(e)
         }
 
 
-# ================== 主逻辑 ==================
+# ================== 单脚本处理 ==================
 
-def main():
+def process_script(script):
 
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    results = []
-    has_fail = False
+    r = run_script(script)
 
-    for script in SCRIPTS:
+    status = "✅ 成功" if r["exit_code"] == 0 else f"❌ 失败 (code={r['exit_code']})"
 
-        result = run_script(script)
-
-        results.append(result)
-
-        if result["exit_code"] != 0:
-            has_fail = True
-
-    # 如果设置为仅失败通知
-    if ONLY_FAIL_NOTIFY and not has_fail:
-        print("全部成功，不发送通知")
+    if ONLY_FAIL_NOTIFY and r["exit_code"] == 0:
         return
 
-    # 组装最终日志
     message_lines = []
 
     message_lines.append(f"📅 执行时间: {now}")
+    message_lines.append(f"脚本: {script}")
+    message_lines.append(f"状态: {status}")
     message_lines.append("")
 
-    for r in results:
-
-        status = "✅ 成功" if r["exit_code"] == 0 else f"❌ 失败 (code={r['exit_code']})"
-
-        message_lines.append(f"【{r['name']}】{status}")
+    if r["stdout"]:
+        message_lines.append(r["stdout"])
         message_lines.append("")
 
-        if r["stdout"]:
-            message_lines.append(r["stdout"])
-            message_lines.append("")
+    if r["stderr"]:
+        message_lines.append("⚠️ STDERR:")
+        message_lines.append(r["stderr"])
+        message_lines.append("")
 
-        if r["stderr"]:
-            message_lines.append("⚠️ STDERR:")
-            message_lines.append(r["stderr"])
-            message_lines.append("")
+    message = "\n".join(message_lines)
 
-        message_lines.append("=" * 40)
+    send_telegram(message)
 
-    final_message = "\n".join(message_lines)
 
-    send_telegram(final_message)
+# ================== 主函数 ==================
+
+def main():
+
+    with ThreadPoolExecutor(max_workers=len(SCRIPTS)) as executor:
+
+        futures = [executor.submit(process_script, s) for s in SCRIPTS]
+
+        for future in as_completed(futures):
+            future.result()
 
 
 if __name__ == "__main__":
