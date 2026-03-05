@@ -18,6 +18,9 @@ def send_telegram(message):
     if len(message) > 4000:
         message = message[:4000] + "\n...(日志过长已截断)"
 
+    title = "科研通\n\n"  # 添加标题
+    full_message = title + message  # 在消息前加上标题
+
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
     try:
@@ -25,7 +28,7 @@ def send_telegram(message):
             url,
             json={
                 "chat_id": TELEGRAM_CHAT_ID,
-                "text": message
+                "text": full_message
             },
             timeout=20
         )
