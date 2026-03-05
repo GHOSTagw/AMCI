@@ -16,7 +16,7 @@ ONLY_FAIL_NOTIFY = os.getenv("ONLY_FAIL_NOTIFY", "false").lower() == "true"
 
 # 需要执行的脚本列表
 SCRIPTS = [
-    "action_ablesci_sign.py",
+    "ablesci_GPT_n.py",
     # 以后新增脚本只需在这里加
 ]
 
