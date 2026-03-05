@@ -2,6 +2,7 @@
 # coding=utf-8
 
 import os
+import sys
 import subprocess
 import datetime
 import requests
@@ -14,16 +15,17 @@ TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 # 是否仅在失败时发送
 ONLY_FAIL_NOTIFY = os.getenv("ONLY_FAIL_NOTIFY", "false").lower() == "true"
 
-# 需要执行的脚本列表
+# 需要执行的脚本列表（手动维护）
 SCRIPTS = [
     "ablesci_GPT_n.py",
-    # 以后新增脚本只需在这里加
+    "baidupan_GPT_n.py",
 ]
 
 
 # ================== Telegram 发送 ==================
 
 def send_telegram(message: str):
+
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("Telegram 未配置")
         return
@@ -35,7 +37,8 @@ def send_telegram(message: str):
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
     try:
-        requests.post(
+
+        resp = requests.post(
             url,
             json={
                 "chat_id": TELEGRAM_CHAT_ID,
@@ -43,6 +46,10 @@ def send_telegram(message: str):
             },
             timeout=30
         )
+
+        if resp.status_code != 200:
+            print("Telegram发送失败:", resp.text)
+
     except Exception as e:
         print("Telegram 发送异常:", e)
 
@@ -50,9 +57,19 @@ def send_telegram(message: str):
 # ================== 执行脚本 ==================
 
 def run_script(script_name):
+
+    if not os.path.exists(script_name):
+        return {
+            "name": script_name,
+            "exit_code": 97,
+            "stdout": "",
+            "stderr": "脚本不存在"
+        }
+
     try:
+
         result = subprocess.run(
-            ["python3", script_name],
+            [sys.executable, script_name],
             capture_output=True,
             text=True,
             timeout=300
@@ -70,6 +87,7 @@ def run_script(script_name):
         }
 
     except subprocess.TimeoutExpired:
+
         return {
             "name": script_name,
             "exit_code": 99,
@@ -78,6 +96,7 @@ def run_script(script_name):
         }
 
     except Exception as e:
+
         return {
             "name": script_name,
             "exit_code": 98,
@@ -89,12 +108,16 @@ def run_script(script_name):
 # ================== 主逻辑 ==================
 
 def main():
+
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     results = []
     has_fail = False
 
     for script in SCRIPTS:
+
         result = run_script(script)
+
         results.append(result)
 
         if result["exit_code"] != 0:
@@ -107,11 +130,14 @@ def main():
 
     # 组装最终日志
     message_lines = []
+
     message_lines.append(f"📅 执行时间: {now}")
     message_lines.append("")
 
     for r in results:
+
         status = "✅ 成功" if r["exit_code"] == 0 else f"❌ 失败 (code={r['exit_code']})"
+
         message_lines.append(f"【{r['name']}】{status}")
         message_lines.append("")
 
@@ -127,6 +153,7 @@ def main():
         message_lines.append("=" * 40)
 
     final_message = "\n".join(message_lines)
+
     send_telegram(final_message)
 
 
