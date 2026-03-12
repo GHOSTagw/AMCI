@@ -1,4 +1,4 @@
-# An Automatic Check-in Script
+# Automatic Check-in Scripts
 [![action_BD](https://github.com/GHOSTagw/AMCI/actions/workflows/action_checkin.yml/badge.svg)](https://github.com/GHOSTagw/AMCI/actions/workflows/action_checkin.yml)
 
 This repository collects auto check-in projects from others for learning and personal use.
